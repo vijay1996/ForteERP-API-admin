@@ -6,7 +6,7 @@ export default function Signin (req:any, res:any) {
     const payload: any = {
       email: req.body.email
     }
-    FIND_ONE('maintenance_organisation', payload)
+    FIND_ONE('organisation', payload)
       .then(data => {
         if (data.active) {
           bcrypt.compare(req.body.password, data.password)
@@ -22,7 +22,7 @@ export default function Signin (req:any, res:any) {
             res.json(`Some error occurred! Please try again later. [${error.name}] = ${error.message}`);
           });
         } else {
-          res.json('Please click on the link sent to your mail to verify your account or follow this link to resend verification email - ' + `${process.env.BASE_URL}/resend_verification_email/${payload.email}`);
+          res.json('Please click on the link sent to your mail to verify your account or follow this link to resend verification email - ' + `${process.env.ADMIN_BASE_URL}/resend_verification_email/${payload.email}`);
         }
       })
       .catch(error => {

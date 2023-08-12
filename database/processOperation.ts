@@ -3,17 +3,16 @@ import dotenv from 'dotenv';
 import collections from './collections.js';
 
 dotenv.config();
-mongoose.connect(process.env.DB_URL as string).then(data => {
+mongoose.connect(process.env.ADMIN_DB_URL as string).then(data => {
     console.log("Connected to the database successfully!");
 }).catch(err => {
     console.log(err);
 });
 
-console.log(process.env.DB_URL);
-
 export async function INSERT (collection: string, record:any) {
     console.log(`Attempting to INSERT - \n${JSON.stringify(record)}`);
     const payload:Array<any>  = Array.isArray(record) ? record : [record];
+    console.log(payload);
     //@ts-ignore
     return await collections[`${collection}`].insertMany(payload);
 }

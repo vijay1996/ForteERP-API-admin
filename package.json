@@ -6,10 +6,8 @@
   "type": "module",
   "scripts": {
     "build": "npx tsc",
-    "start": "pm2 start index.js -n ForteErp-API-admin",
-    "dev": "pm2 start dist/index.js -n ForteERP-API-admin",
-    "typescript": "npx tsc --watch",
-    "logs": "pm2 logs ForteERP-API-admin"
+    "prod": "pm2-runtime start index.js -n ForteERP-API-global",
+    "dev": "concurrently \"npx tsc --watch\" \"node dist/index.js --watch\""
   },
   "keywords": [],
   "author": "",
@@ -17,6 +15,7 @@
   "dependencies": {
     "bcrypt": "^5.1.0",
     "body-parser": "^1.20.2",
+    "concurrently": "^8.2.0",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
