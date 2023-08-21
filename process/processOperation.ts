@@ -4,18 +4,21 @@ import { removeDuplicatesDocuments } from "../util/commonLogic.js";
 import { verifToken } from "../util/jwt.js";
 
 export default function ProcessOperation (req:any, res:any) {
+    console.log(`----------------- ADMIN MICROSERVICE HIT -----------------\n`);
     const screen = req.params.screen;
     const call = req.params.call;
     const search = req.params.search;
     const email = req.headers.useremail;
+    let payload = req.body;
     FIND_ONE('organisation', {email})
-      .then(data => {
-        if(!data._id) res.json(getReadableError('signupError'));
-        const loginStatus = verifToken(req.headers['authorization']?.split(' ')[1] as string, data._id.toString());
+      .then(response => {
+        if(!response._id) res.json(getReadableError('signupError'));
+        payload = screen === 'organisation' ? payload : {...payload, uniqueOrgId: response._id.toString()};
+        const loginStatus = verifToken(req.headers['authorization']?.split(' ')[1] as string, response._id.toString());
         if (loginStatus.name === 'success') {
           switch (call) {
             case 'add':
-              INSERT(screen.toLowerCase(), req.body)
+              INSERT(screen.toLowerCase(), payload)
                 .then(data => res.json(data))
                 .catch(error => {
                   console.log(error);
@@ -23,27 +26,27 @@ export default function ProcessOperation (req:any, res:any) {
                 });
                 break;
             case 'update':
-              UPDATE(screen.toLowerCase(), req.body)
+              UPDATE(screen.toLowerCase(), payload)
                 .then(data => res.json(data))
                 .catch(error => res.json(error));
                 break;
             case 'delete':
-              DELETE(screen.toLowerCase(), req.body)
+              DELETE(screen.toLowerCase(), payload)
                 .then(data => res.json(data))
                 .catch(error => res.json(error));
                 break;
             case 'list':
               search ? 
-                SEARCH_LIST(screen.toLowerCase(), req.body, search as string)
+                SEARCH_LIST(screen.toLowerCase(), payload, search as string)
                   .then(data => res.json(removeDuplicatesDocuments(data, null)))
                   .catch(error => res.json(error)) :
-                LIST(screen.toLowerCase(), req.body)
+                LIST(screen.toLowerCase(), payload)
                   .then(data => res.json(data))
                   .catch(error => res.json(error));
               break;
             case 'dynamicSelect':
-                DYNAMIC_SELECT(screen.toLowerCase(), req.body)
-                  .then(data => res.json(removeDuplicatesDocuments(data, Object.keys(req.body)[0])))
+                DYNAMIC_SELECT(screen.toLowerCase(), payload)
+                  .then(data => res.json(removeDuplicatesDocuments(data, Object.keys(payload)[0])))
                   .catch(error => res.json(error));
           }
         } else {
