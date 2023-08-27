@@ -13,11 +13,12 @@ export default function ProcessOperation (req:any, res:any) {
     FIND_ONE('organisation', {email})
       .then(response => {
         if(!response._id) res.json(getReadableError('signupError'));
-        payload = screen === 'organisation' ? payload : {...payload, uniqueOrgId: response._id.toString()};
         const loginStatus = verifToken(req.headers['authorization']?.split(' ')[1] as string, response._id.toString());
         if (loginStatus.name === 'success') {
           switch (call) {
             case 'add':
+              payload = screen === 'organisation' ? payload : {...payload, uniqueOrgId: response._id.toString()};
+              console.log(payload);
               INSERT(screen.toLowerCase(), payload)
                 .then(data => res.json(data))
                 .catch(error => {
@@ -26,6 +27,7 @@ export default function ProcessOperation (req:any, res:any) {
                 });
                 break;
             case 'update':
+              payload = screen === 'organisation' ? payload : {...payload, uniqueOrgId: response._id.toString()};
               UPDATE(screen.toLowerCase(), payload)
                 .then(data => res.json(data))
                 .catch(error => res.json(error));
@@ -36,6 +38,7 @@ export default function ProcessOperation (req:any, res:any) {
                 .catch(error => res.json(error));
                 break;
             case 'list':
+              payload = screen === 'organisation' ? payload : {...payload, uniqueOrgId: response._id.toString()};
               search ? 
                 SEARCH_LIST(screen.toLowerCase(), payload, search as string)
                   .then(data => res.json(removeDuplicatesDocuments(data, null)))
@@ -45,6 +48,7 @@ export default function ProcessOperation (req:any, res:any) {
                   .catch(error => res.json(error));
               break;
             case 'dynamicSelect':
+                payload = screen === 'organisation' ? payload : {...payload, uniqueOrgId: response._id.toString()};
                 DYNAMIC_SELECT(screen.toLowerCase(), payload)
                   .then(data => res.json(removeDuplicatesDocuments(data, Object.keys(payload)[0])))
                   .catch(error => res.json(error));

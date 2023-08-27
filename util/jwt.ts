@@ -17,9 +17,9 @@ export function verifToken (token: string, fetchedId: string) {
         if (fetchedId === decoded._id) {
             return {name:"success"};
         } else {
-            return getReadableError('tokenInvalid');
+            return {...getReadableError('tokenInvalid'), logout: true};
         } 
     } catch (e) {
-        return {name: "CustomError", message: e}
+        return {name: "CustomError", message: e, logout: true}
     }
 }
